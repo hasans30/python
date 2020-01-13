@@ -3,29 +3,18 @@
 # importing all necessery modules
 from wordcloud import WordCloud, STOPWORDS
 import matplotlib.pyplot as plt
-import pandas as pd
-
-# Reads 'Youtube04-Eminem.csv' file
-df = pd.read_csv(r"Youtube04-Eminem.csv", encoding="utf-8")
-
+import re
 comment_words = ' '
 stopwords = set(STOPWORDS)
-# iterate through the csv file
-for val in df.CONTENT:
-
-    # typecaste each val to string
-    val = str(val)
-
-    # split the value
-    tokens = val.split()
-
+# Reads 'Youtube04-Eminem.csv' file
+f = open('text.txt',"r", encoding="utf-8")
+for line in f:
+    tokens = line.split()
     # Converts each token into lowercase
     for i in range(len(tokens)):
         tokens[i] = tokens[i].lower()
-
     for words in tokens:
         comment_words = comment_words + words + ' '
-
 
 wordcloud = WordCloud(width=800, height=800,
                       background_color='white',
