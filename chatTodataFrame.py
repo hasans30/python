@@ -1,3 +1,4 @@
+from barChart import add_value_labels
 import matplotlib.pyplot as plt
 import pandas as pd
 import re
@@ -50,9 +51,10 @@ mergeddf=pd.merge(left=allmsg_stat, right=mediadf_stat, how='left',left_on='send
 print(mergeddf)
 # print(mediadf_stat.to_string(index=False))
 ax = plt.gca()
-mergeddf.plot(kind='bar',x='sender',y='count_x', ax=ax, label='Total msg')
-mergeddf.plot(kind='bar' , x='sender', y='count_y', color='red', ax=ax, label='Media')
+mergeddf.plot(kind='bar',x='sender',y='count_x', ax=ax, label='Total msg', align='edge', width=0.3)
+mergeddf.plot(kind='bar' , x='sender', y='count_y', color='red', ax=ax, label='Media',align='edge', width=0.3)
 fig = plt.gcf()
 fig.set_size_inches((11,8.5), forward=False)
+add_value_labels(ax)
 plt.savefig('chart.png')
 plt.show()
