@@ -38,7 +38,16 @@ def parse_file(text_file):
 
 
 # Printing number of messages by sender
-df = parse_file('nhs.txt')
+df = parse_file('backup.nhs.txt')
 print(df.head(3))
 stat=df[['sender','message']].groupby(['sender'],sort=False)['message'].count().reset_index(name='count').sort_values(['count'],ascending=False)
-print(stat[['sender','count']])
+stat=stat.reset_index(drop=True)
+print(stat.to_string(index=False))
+
+#count of media omitted i.e forward images/video/voice msg
+mediaPattern = r"(\<Media omitted\>)" 
+
+mediadf=df[df.message.str.match(mediaPattern)]
+mediadf_stat=mediadf[['sender','message']].groupby(['sender'],sort=False)['message'].count().reset_index(name='count').sort_values(['count'],ascending=False).reset_index(drop=True)
+
+print(mediadf_stat.to_string(index=False))
