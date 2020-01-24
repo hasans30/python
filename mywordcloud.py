@@ -7,7 +7,7 @@ import re
 comment_words = ' '
 stopwords = set(STOPWORDS)
 # Reads 'Youtube04-Eminem.csv' file
-f = open('text.txt',"r", encoding="utf-8")
+f = open('nhs.txt',"r", encoding="utf-8")
 for line in f:
     tokens = line.split()
     # Converts each token into lowercase

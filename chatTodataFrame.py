@@ -1,3 +1,4 @@
+from members import allMembersdf 
 from barChart import add_value_labels
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -38,23 +39,36 @@ def parse_file(text_file):
     
     return df
 
-
 # Printing number of messages by sender
-df = parse_file('backup.nhs.txt')
+df = parse_file('jan.nhs.txt')
 allmsg_stat=df[['sender','message']].groupby(['sender'],sort=False)['message'].count().reset_index(name='count').sort_values(['count'],ascending=False).reset_index(drop=True)
-print(allmsg_stat)
+# print(allmsg_stat)
 #count of media omitted i.e forward images/video/voice msg
 mediaPattern = r"(\<Media omitted\>)" 
 mediadf=df[df.message.str.match(mediaPattern)]
 mediadf_stat=mediadf[['sender','message']].groupby(['sender'],sort=False)['message'].count().reset_index(name='count').sort_values(['count'],ascending=False).reset_index(drop=True)
 mergeddf=pd.merge(left=allmsg_stat, right=mediadf_stat, how='left',left_on='sender', right_on='sender')
-print(mergeddf)
+mergeddf=mergeddf.fillna(0)
+mergeddf=mergeddf.astype({'count_x': 'int64','count_y':'int64'})
+
 # print(mediadf_stat.to_string(index=False))
 ax = plt.gca()
-mergeddf.plot(kind='bar',x='sender',y='count_x', ax=ax, label='Total msg', align='edge', width=0.3)
-mergeddf.plot(kind='bar' , x='sender', y='count_y', color='red', ax=ax, label='Media',align='edge', width=0.3)
+mergeddf.plot(kind='bar',x='sender',y='count_x', ax=ax, label='Total msg', align='edge' )
+mergeddf.plot(kind='bar' , x='sender', y='count_y', color='red', ax=ax, label='Media',align='edge')
 fig = plt.gcf()
-fig.set_size_inches((11,8.5), forward=False)
+fig.set_size_inches((20,20), forward=False)
+
 add_value_labels(ax)
 plt.savefig('chart.png')
 plt.show()
+
+
+
+mergeddf=pd.merge(right=mergeddf, left=allMembersdf, how='left',left_on='sender', right_on='sender')
+mergeddf=mergeddf.fillna(0)
+mergeddf=mergeddf.astype({'count_x': 'int64','count_y':'int64'})
+print('folks did not sent any msg:')
+print(mergeddf[(mergeddf["count_x"]==0) & (mergeddf["count_y"]==0)])
+
+print('Detail stat:')
+print(mergeddf)
