@@ -60,7 +60,7 @@ fig.set_size_inches((20,20), forward=False)
 
 add_value_labels(ax)
 plt.savefig('chart.png')
-plt.show()
+# plt.show()
 
 
 
@@ -71,4 +71,4 @@ print('folks did not sent any msg:')
 print(mergeddf[(mergeddf["count_x"]==0) & (mergeddf["count_y"]==0)])
 
 print('Detail stat:')
-print(mergeddf)
+print(mergeddf.sort_values(by='count_x', ascending=False)[['sender','count_x','count_y']].reset_index(drop=True))
