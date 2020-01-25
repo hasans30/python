@@ -1,11 +1,13 @@
 def get_printable_y_value(y_value, index, groupLength, patches):
+    # disabling extra labeling logic
+    return y_value
     """ if 1st group has very less value e.g 10, we want to omit 2nd and 3rd group values
-    """
     threshold = 10
     if(index >= groupLength and patches[index % groupLength].get_height() < threshold):
         return 0  # if 0, we don't print in the graph
     else:
         return y_value
+    """
 
 
 def add_value_labels(ax, spacing=5):

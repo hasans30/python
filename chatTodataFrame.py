@@ -3,6 +3,7 @@ from members import allMembersdf
 from barChart import add_value_labels
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 import re
 
 
@@ -79,24 +80,35 @@ mergeddf = mergeddf.fillna(0)
 mergeddf = mergeddf.astype(
     {'count_allmsg': 'int64', 'count_media': 'int64', 'count_singleword': 'int64'})
 ax = plt.gca()
+colors = ['blue', 'green', 'red']
+labels = ['total messages', 'count of media',
+          'count of single letter messages']
+columnNames = ['count_allmsg', 'count_media', 'count_singleword']
 
-mergeddf.plot(kind='bar', x='sender', y='count_allmsg', ax=ax,
-              color='green', label='Total msg', align='edge')
-mergeddf.plot(kind='bar', x='sender', y='count_media',
-              color='blue', ax=ax, label='Media msg', align='edge')
-mergeddf.plot(kind='bar', x='sender', y='count_singleword',
-              color='red', ax=ax, label='Single Letter msg', align='edge')
-
+mergeddf = mergeddf.sort_values(
+    by='count_allmsg', ascending=False).reset_index(drop=True)
+print(mergeddf)
+width = 1
+barPositions = [-1, 0, 1]
+nameLabels = []
+labelLocations = []
+for index, row in mergeddf.iterrows():
+    gap = .65 if index > 0 else 0
+    nameLabels.append(row['sender'])
+    barInfo = zip([row[columnNames[0]], row[columnNames[1]],
+                   row[columnNames[2]]], colors, labels, barPositions)
+    for i, (h, c, l, p) in enumerate(barInfo):
+        barCenter = index*3+p*width+gap
+        if(i == 1):
+            labelLocations.append(barCenter)
+        plt.bar(barCenter, h, width=width,
+                color=c, zorder=-i, label=l if index == 0 else '')
+        gap = 0
+ax.set_xticks(labelLocations)
+ax.set_xticklabels(nameLabels, rotation=90, ha='center')
+handles, chartLabels = ax.get_legend_handles_labels()
+ax.legend(handles, chartLabels)
 fig = plt.gcf()
 fig.set_size_inches((20, 20), forward=False)
 add_value_labels(ax)
 plt.savefig('chart.png')
-# plt.show()
-
-
-# uncomment to print folks did not sent any msg
-# print(mergeddf[(mergeddf["count_x"]==0) & (mergeddf["count_y"]==0)])
-
-print('Detail stat:')
-print(mergeddf.sort_values(by='count_allmsg', ascending=False)[
-      ['sender', 'count_allmsg', 'count_media', 'count_singleword']].reset_index(drop=True))
