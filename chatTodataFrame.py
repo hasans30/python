@@ -1,3 +1,4 @@
+import sys
 from members import allMembersdf 
 from barChart import add_value_labels
 import matplotlib.pyplot as plt
@@ -40,7 +41,10 @@ def parse_file(text_file):
     return df
 
 # Printing number of messages by sender
-df = parse_file('jan.nhs.txt')
+if len(sys.argv) != 2:
+    print('usage:{name} <chat file name>'.format(name=sys.argv[0]))
+    exit(1)
+df = parse_file(sys.argv[1])
 allmsg_stat=df[['sender','message']].groupby(['sender'],sort=False)['message'].count().reset_index(name='count').sort_values(['count'],ascending=False).reset_index(drop=True)
 # print(allmsg_stat)
 #count of media omitted i.e forward images/video/voice msg
