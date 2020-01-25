@@ -47,7 +47,6 @@ if len(sys.argv) != 2:
 df = parse_file(sys.argv[1])
 
 allmsg_stat=df[['sender','message']].groupby(['sender'],sort=False)['message'].count().reset_index(name='count').sort_values(['count'],ascending=False).reset_index(drop=True)
-# print(allmsg_stat)
 #count of media omitted i.e forward images/video/voice msg
 mediaPattern = r"(\<Media omitted\>)" 
 mediadf=df[df.message.str.match(mediaPattern)]
@@ -56,31 +55,27 @@ mergeddf=pd.merge(left=allmsg_stat, right=mediadf_stat, how='left',left_on='send
 
 singleWordMessagePattern = r"(.{1}$)"
 singleWordDf=df[df.message.str.match(singleWordMessagePattern)]
-print(singleWordDf)
 singleWordDf_stat=singleWordDf[['sender','message']].groupby(['sender'],sort=False)['message'].count().reset_index(name='count').sort_values(['count'],ascending=False).reset_index(drop=True)
 mergeddf=pd.merge(left=mergeddf, right=singleWordDf_stat, how='left',left_on='sender', right_on='sender')
 mergeddf.columns=['sender','count_allmsg','count_media','count_singleword']
 
+# whoever didn't send any messages
+mergeddf=pd.merge(right=mergeddf, left=allMembersdf, how='left',left_on='sender', right_on='sender')
 mergeddf=mergeddf.fillna(0)
 mergeddf=mergeddf.astype({'count_allmsg': 'int64','count_media':'int64', 'count_singleword':'int64'})
-print(mergeddf)
-# print(mediadf_stat.to_string(index=False))
 ax = plt.gca()
 mergeddf.plot(kind='bar',x='sender',y='count_allmsg', ax=ax, color='green', label='Total msg', align='edge' )
 mergeddf.plot(kind='bar' , x='sender', y='count_media', color='blue', ax=ax, label='Media msg',align='edge')
 mergeddf.plot(kind='bar' , x='sender', y='count_singleword', color='red', ax=ax, label='Single Letter msg',align='edge')
 fig = plt.gcf()
 fig.set_size_inches((20,20), forward=False)
-
 add_value_labels(ax)
 plt.savefig('chart.png')
 # plt.show()
 
 
-
-mergeddf=pd.merge(right=mergeddf, left=allMembersdf, how='left',left_on='sender', right_on='sender')
-# print('folks did not sent any msg:')
+# uncomment to print folks did not sent any msg
 # print(mergeddf[(mergeddf["count_x"]==0) & (mergeddf["count_y"]==0)])
 
-# print('Detail stat:')
-# print(mergeddf.sort_values(by='count_x', ascending=False)[['sender','count_x','count_y']].reset_index(drop=True))
+print('Detail stat:')
+print(mergeddf.sort_values(by='count_allmsg', ascending=False)[['sender','count_allmsg','count_media','count_singleword']].reset_index(drop=True))
