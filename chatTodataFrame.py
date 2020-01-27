@@ -2,9 +2,13 @@ import sys
 from members import allMembersdf
 from barChart import add_value_labels
 import matplotlib.pyplot as plt
+import matplotlib
 import pandas as pd
 import numpy as np
 import re
+
+
+matplotlib.rcParams['font.sans-serif'] = ['Source Han Sans TW', 'sans-serif']
 
 
 def parse_file(text_file):
@@ -111,4 +115,6 @@ ax.legend(handles, chartLabels)
 fig = plt.gcf()
 fig.set_size_inches((20, 20), forward=False)
 add_value_labels(ax)
+meanpoint = mergeddf[columnNames[0]].mean()
+ax.axhline(meanpoint, ls='--', color='r')
 plt.savefig('chart.png')
