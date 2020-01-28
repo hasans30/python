@@ -10,3 +10,4 @@ local/
 Scripts
 tcl/
 pyvenv.cfg
+.vscode/

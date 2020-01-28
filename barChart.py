@@ -67,10 +67,10 @@ def plotChart(mergeddf):
     mergeddf = mergeddf.sort_values(
         by='count_allmsg', ascending=False).reset_index(drop=True)
     print(mergeddf)
-    width = 1
-    gap = .65
+    width = 1.5
+    gap = 1
     barCenter = 0
-    newGroupFirstCenter = -1
+    newGroupFirstCenter = -1*width
     nameLabels = []
     labelLocations = []
     for index, row in mergeddf.iterrows():
@@ -78,7 +78,7 @@ def plotChart(mergeddf):
         barInfo = zip([row[columnNames[0]], row[columnNames[1]],
                        row[columnNames[2]]], colors, labels)
         for i, (h, c, l) in enumerate(barInfo):
-            barCenter = i + newGroupFirstCenter
+            barCenter = i*width + newGroupFirstCenter
             if(i == 1):
                 labelLocations.append(barCenter)
             plt.bar(barCenter, h, width=width,
