@@ -57,7 +57,7 @@ def add_value_labels(ax, spacing=5):
         # positive and negative values.
 
 
-def plotChart(mergeddf):
+def plotChart(mergeddf,filename):
     ax = plt.gca()
     colors = ['blue', 'green', 'red']
     labels = ['all', 'media(pic,voice,video)',
@@ -95,4 +95,4 @@ def plotChart(mergeddf):
     meanlabel = 'mean '+str(int(meanpoint))
     ax.axhline(meanpoint, ls='--', color='r', label=meanlabel)
     plt.legend()
-    plt.savefig('chart.png')
+    plt.savefig(filename)

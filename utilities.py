@@ -1,7 +1,7 @@
 import re
 import numpy as np
 import pandas as pd
-
+import datetime
 
 def parse_file(text_file):
     '''Convert WhatsApp chat log text file to a Pandas dataframe.'''
@@ -81,3 +81,19 @@ def countSingleLetterMessage(df, mediaOmitted_stat):
                                  'count_media', 'count_singleword']
 
     return singleWordDf_stat
+
+def getDateTimeAndFileName(sys):
+    need_date_filter=False
+    date_time_str = '1970-01-01 00:00:00'
+    date_time_obj = datetime.datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S')
+    opFileName='chart-all.png'
+    if (len(sys.argv)>2):
+        #possible timestamp in argument
+        try:
+            datevalue=datetime.datetime.strptime(sys.argv[2],'%Y-%m')
+            date_time_obj=datevalue
+            opFileName='chart'+sys.argv[2]+'.png'
+            need_date_filter=True
+        except:
+            print('using default datetime')
+    return date_time_obj, opFileName, need_date_filter
