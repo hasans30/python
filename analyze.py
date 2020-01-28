@@ -93,28 +93,29 @@ mergeddf = mergeddf.sort_values(
     by='count_allmsg', ascending=False).reset_index(drop=True)
 print(mergeddf)
 width = 1
-barPositions = [-1, 0, 1]
+gap = .65
+barCenter = 0
+newGroupFirstCenter = -1
 nameLabels = []
 labelLocations = []
 for index, row in mergeddf.iterrows():
-    gap = .65 if index > 0 else 0
     nameLabels.append(row['sender'])
     barInfo = zip([row[columnNames[0]], row[columnNames[1]],
-                   row[columnNames[2]]], colors, labels, barPositions)
-    for i, (h, c, l, p) in enumerate(barInfo):
-        barCenter = index*3+p*width+gap
+                   row[columnNames[2]]], colors, labels)
+    for i, (h, c, l) in enumerate(barInfo):
+        barCenter = i + newGroupFirstCenter
         if(i == 1):
             labelLocations.append(barCenter)
         plt.bar(barCenter, h, width=width,
                 color=c, zorder=-i, label=l if index == 0 else '')
-        gap = 0
+    newGroupFirstCenter = (width+gap)+barCenter
 ax.set_xticks(labelLocations)
 ax.set_xticklabels(nameLabels, rotation=90, ha='center')
 handles, chartLabels = ax.get_legend_handles_labels()
 ax.legend(handles, chartLabels)
 fig = plt.gcf()
 fig.set_size_inches((20, 20), forward=False)
-add_value_labels(ax)
+add_value_labels(ax, 8)
 meanpoint = mergeddf[columnNames[0]].fillna(0).mean()
 meanlabel = 'mean '+str(int(meanpoint))
 ax.axhline(meanpoint, ls='--', color='r', label=meanlabel)
