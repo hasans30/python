@@ -50,8 +50,7 @@ allMembers = {
 'Tushar Maji Nhs',
 'Ujjal Kumar Chakraborty',
 'rudra NHS',
-'ফড়ে Subho Nhs'],
-'count':[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+'ফড়ে Subho Nhs']
 
 }
-allMembersdf = pd.DataFrame (allMembers , columns =['sender','count'])
+allMembersdf = pd.DataFrame (allMembers , columns =['sender'])

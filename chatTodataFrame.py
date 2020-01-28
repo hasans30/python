@@ -17,7 +17,7 @@ def parse_file(text_file):
     # some regex to account for messages taking up multiple lines
     pat = re.compile(
         r'^(\d{1,2}\/\d{1,2}\/\d{2}.*?)(?=^\d{1,2}\/\d{1,2}\/\d{2}.*?|\Z)', re.S | re.M)
-    with open(text_file) as f:
+    with open(text_file, encoding='utf-8') as f:
         data = [m.group(1).strip().replace('\n', ' ')
                 for m in pat.finditer(f.read())]
 
