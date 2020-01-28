@@ -69,9 +69,15 @@ def mergeWithAllMembersData(mergeddf, allMembersdf):
     return mergeddf
 
 
-def countSingleLetterMessage(df):
+def countSingleLetterMessage(df, mediaOmitted_stat):
     singleWordMessagePattern = r"(.{1}$)"
     singleWordDf = df[df.message.str.match(singleWordMessagePattern)]
     singleWordDf_stat = singleWordDf[['sender', 'message']].groupby(['sender'], sort=False)['message'].count(
     ).reset_index(name='count').sort_values(['count'], ascending=False).reset_index(drop=True)
+
+    singleWordDf_stat = pd.merge(left=mediaOmitted_stat, right=singleWordDf_stat,
+                                 how='left', left_on='sender', right_on='sender')
+    singleWordDf_stat.columns = ['sender', 'count_allmsg',
+                                 'count_media', 'count_singleword']
+
     return singleWordDf_stat

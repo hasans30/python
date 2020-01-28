@@ -14,13 +14,7 @@ df = utilities.parse_file(sys.argv[1])
 
 allmsg_stat = utilities.countAllMessaages(df)
 mediaOmitted_stat = utilities.countMedia(df, allmsg_stat)
-singleWordDf_stat = utilities.countSingleLetterMessage(df)
-
-mergeddf = pd.merge(left=mediaOmitted_stat, right=singleWordDf_stat,
-                    how='left', left_on='sender', right_on='sender')
-mergeddf.columns = ['sender', 'count_allmsg',
-                    'count_media', 'count_singleword']
-
-mergeddf = utilities.mergeWithAllMembersData(mergeddf, allMembersdf)
+singleWordDf_stat = utilities.countSingleLetterMessage(df, mediaOmitted_stat)
+mergeddf = utilities.mergeWithAllMembersData(singleWordDf_stat, allMembersdf)
 # drawing chart
 plotChart(mergeddf)
