@@ -7,3 +7,6 @@ chart.png
 lib
 include/
 local/
+Scripts
+tcl/
+pyvenv.cfg
