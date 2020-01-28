@@ -49,5 +49,6 @@ def add_value_labels(ax, spacing=5):
             xytext=(0, space),          # Vertically shift label by `space`
             textcoords="offset points",  # Interpret `xytext` as offset in points
             ha='center',                # Horizontally center label
+            color='brown',
             va=va)                      # Vertically align label differently for
         # positive and negative values.

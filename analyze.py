@@ -79,14 +79,14 @@ mergeddf.columns = ['sender', 'count_allmsg',
 
 # whoever didn't send any messages
 mergeddf = pd.merge(right=mergeddf, left=allMembersdf,
-                    how='left', left_on='sender', right_on='sender')
+                    how='outer', left_on='sender', right_on='sender')
 mergeddf = mergeddf.fillna(0)
 mergeddf = mergeddf.astype(
     {'count_allmsg': 'int64', 'count_media': 'int64', 'count_singleword': 'int64'})
 ax = plt.gca()
 colors = ['blue', 'green', 'red']
-labels = ['total messages', 'count of media',
-          'count of single letter messages']
+labels = ['all', 'media(pic,voice,video)',
+          'single letter']
 columnNames = ['count_allmsg', 'count_media', 'count_singleword']
 
 mergeddf = mergeddf.sort_values(
@@ -115,8 +115,8 @@ ax.legend(handles, chartLabels)
 fig = plt.gcf()
 fig.set_size_inches((20, 20), forward=False)
 add_value_labels(ax)
-meanpoint = mergeddf[columnNames[0]].mean()
-meanlabel= 'mean '+str(int(meanpoint))
+meanpoint = mergeddf[columnNames[0]].fillna(0).mean()
+meanlabel = 'mean '+str(int(meanpoint))
 ax.axhline(meanpoint, ls='--', color='r', label=meanlabel)
 plt.legend()
 plt.savefig('chart.png')
