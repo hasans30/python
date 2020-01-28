@@ -11,7 +11,8 @@ if len(sys.argv) < 2:
     print('usage:{name} <chat file name> <2020-01>'.format(name=sys.argv[0]))
     exit(1)
 
-date_time_obj, opFileName, filter_needed = utilities.getDateTimeAndFileName(sys)
+date_time_obj, opFileName, filter_needed = utilities.getDateTimeAndFileName(
+    sys)
 df = utilities.parse_file(sys.argv[1])
 
 if filter_needed:

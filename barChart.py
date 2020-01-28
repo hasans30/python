@@ -57,7 +57,7 @@ def add_value_labels(ax, spacing=5):
         # positive and negative values.
 
 
-def plotChart(mergeddf,filename):
+def plotChart(mergeddf, filename):
     ax = plt.gca()
     colors = ['blue', 'green', 'red']
     labels = ['all', 'media(pic,voice,video)',
@@ -92,7 +92,12 @@ def plotChart(mergeddf,filename):
     fig.set_size_inches((20, 20), forward=False)
     add_value_labels(ax, 8)
     meanpoint = mergeddf[columnNames[0]].fillna(0).mean()
+    totalmsg = mergeddf[columnNames[0]].fillna(0).sum()
+    toatlmessageLabel = 'Total message: '+str(int(totalmsg))
     meanlabel = 'mean '+str(int(meanpoint))
     ax.axhline(meanpoint, ls='--', color='r', label=meanlabel)
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+    ax.text(0.5, .95, toatlmessageLabel, bbox=props, fontsize=14,
+            verticalalignment='top', transform=ax.transAxes)
     plt.legend()
     plt.savefig(filename)
