@@ -39,7 +39,7 @@ allMembers = {
         'Soumya Nhs',
         'Souvik Nhs',
         'Subhomoy Nhs',
-        'Sudip naktala pros',
+        'Sudip nhs',
         'Sujoy NHS',
         'Sukanto NHS',
         'Sumit Nhs',
