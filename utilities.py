@@ -49,7 +49,7 @@ def parse_file(text_file):
     df = pd.DataFrame(zip(datetime, sender, message, language), columns=[
                       'timestamp', 'sender', 'message', 'language'])
     df['timestamp'] = pd.to_datetime(
-        df.timestamp)  # + pd.Timedelta('13:30:00')
+        df.timestamp) + pd.Timedelta('12:30:00')
 
     # remove events not associated with a sender
     df = df[df.sender != ''].reset_index(drop=True)
