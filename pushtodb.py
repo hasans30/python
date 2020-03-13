@@ -12,6 +12,7 @@ if len(sys.argv) < 2 or os.environ.get('ENGINE_POWER') == None:
     exit(1)
 
 df = utilities.parse_file(sys.argv[1])
+# print(df.head(2))
 engine = create_engine(os.environ['ENGINE_POWER'])
 df.to_sql('chat_text', con=engine, if_exists='append', index=False)
 print('done')

@@ -1,7 +1,8 @@
 import re
 import numpy as np
 import pandas as pd
-import datetime
+import datetime as datetimelib
+import pytz
 from languagelib import detectLang
 
 
@@ -22,7 +23,13 @@ def parse_file(text_file):
     for row in data:
 
         # timestamp is before the first dash
-        datetime.append(row.split(' - ')[0])
+        tmp_dt = row.split(' - ')[0]
+        tmp_dt = datetimelib.datetime.strptime(tmp_dt, '%m/%d/%y, %I:%M %p')
+        pstpdt = pytz.timezone('US/Pacific')
+        tmp_dt = pstpdt.localize(tmp_dt)
+        ist = pytz.timezone('Asia/Calcutta')
+        tmp_dt = tmp_dt.astimezone(ist)
+        datetime.append(tmp_dt)
 
         # sender is between am/pm, dash and colon
         try:
@@ -48,9 +55,10 @@ def parse_file(text_file):
 
     df = pd.DataFrame(zip(datetime, sender, message, language), columns=[
                       'timestamp', 'sender', 'message', 'language'])
-    df['timestamp'] = pd.to_datetime(
-        df.timestamp) + pd.Timedelta('12:30:00')
 
+    df['timestamp'] = pd.to_datetime(
+        df.timestamp)
+# .tz_convert('Asia/Calcutta')
     # remove events not associated with a sender
     df = df[df.sender != ''].reset_index(drop=True)
 
