@@ -1,14 +1,17 @@
 import re
+import os
 import numpy as np
 import pandas as pd
 import datetime as datetimelib
 import pytz
 from languagelib import detectLang
+from checkLastUpdate import LastUpdate
 
 
-def parse_file(text_file):
+def parse_file(text_file, allrecord=True):
     '''Convert WhatsApp chat log text file to a Pandas dataframe.'''
-
+    inputfolder = os.path.dirname(text_file)
+    lu = LastUpdate(inputfolder)
     # some regex to account for messages taking up multiple lines
     pat = re.compile(
         r'^(\d{1,2}\/\d{1,2}\/\d{2}.*?)(?=^\d{1,2}\/\d{1,2}\/\d{2}.*?|\Z)', re.S | re.M)
@@ -29,30 +32,32 @@ def parse_file(text_file):
         tmp_dt = pstpdt.localize(tmp_dt)
         ist = pytz.timezone('Asia/Calcutta')
         tmp_dt = tmp_dt.astimezone(ist)
-        datetime.append(tmp_dt)
 
         # sender is between am/pm, dash and colon
+        tmp_sender = ''
+        tmp_msg = ''
+        tmp_lang = ''
         try:
-            s = re.search('[mM] - (.*?):', row).group(1)
-            sender.append(s)
-        except:
-            sender.append('')
-
+            tmp_sender = re.search('[mM] - (.*?):', row).group(1)
         # message content is after the first colon
-        try:
-            message.append(row.split(': ', 1)[1])
-        except:
-            message.append('')
+            tmp_msg = (row.split(': ', 1)[1])
         # language spoken
-        try:
             line = (row.split(': ', 1)[1])
             if(re.match(r"(\<Media omitted\>)", line)):
-                language.append('media')
+                tmp_lang = 'media'
             else:
-                language.append(detectLang(line))
-        except:
-            language.append('')
+                tmp_lang = (detectLang(line))
 
+            if allrecord == True or lu.shouldInsert(tmp_dt, tmp_sender, tmp_msg):
+                datetime.append(tmp_dt)
+                sender.append(tmp_sender)
+                message.append(tmp_msg)
+                language.append(tmp_lang)
+        except:
+            tmp_lang = ''
+
+    if allrecord == False and len(datetime) > 0:
+        lu.updateInsertTimestamp(datetime[-1], sender[-1], message[-1])
     df = pd.DataFrame(zip(datetime, sender, message, language), columns=[
                       'timestamp', 'sender', 'message', 'language'])
 
@@ -107,7 +112,7 @@ def countSingleLetterMessage(df, mediaOmitted_stat):
 def getDateTimeAndFileName(sys):
     need_date_filter = False
     date_time_str = '1970-01-01 00:00:00'
-    date_time_obj = datetime.datetime.strptime(
+    date_time_obj = datetimelib.datetime.strptime(
         date_time_str, '%Y-%m-%d %H:%M:%S')
     opFileName = 'chart-all.png'
     if (len(sys.argv) > 2):

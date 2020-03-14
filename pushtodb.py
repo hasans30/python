@@ -11,7 +11,7 @@ if len(sys.argv) < 2 or os.environ.get('ENGINE_POWER') == None:
     print('Also, ensure connection string is set in ENGINE_POWER')
     exit(1)
 
-df = utilities.parse_file(sys.argv[1])
+df = utilities.parse_file(sys.argv[1], allrecord=False)
 # print(df.head(2))
 engine = create_engine(os.environ['ENGINE_POWER'])
 df.to_sql('chat_text', con=engine, if_exists='append', index=False)
