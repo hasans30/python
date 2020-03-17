@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import utilities
 from sqlalchemy import create_engine
-
+from telemetry import sendSignal
 
 # Printing number of messages by sender
 if len(sys.argv) < 2 or os.environ.get('ENGINE_POWER') == None:
@@ -18,3 +18,4 @@ df = utilities.parse_file(filename, allrecord=False)
 engine = create_engine(os.environ['ENGINE_POWER'])
 df.to_sql('chat_text', con=engine, if_exists='append', index=False)
 print('done')
+sendSignal("importjob")
