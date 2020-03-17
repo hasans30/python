@@ -1,5 +1,6 @@
 import re
 import os
+import glob
 import numpy as np
 import pandas as pd
 import datetime as datetimelib
@@ -125,3 +126,13 @@ def getDateTimeAndFileName(sys):
         except:
             print('using default datetime')
     return date_time_obj, opFileName, need_date_filter
+
+
+def GetLatestFile(dirname, pattern):
+    list_of_files = glob.glob(dirname+pattern)
+    latest_file = ''
+    try:
+        latest_file = max(list_of_files, key=os.path.getctime)
+    except:
+        pass
+    return latest_file
