@@ -170,19 +170,35 @@ def GetLatestFile(dirname, pattern):
 
 
 def parse_action(text):
-    allmatches = get_action_type(text)
+    return get_action_type(text)
 
 
 def get_action_type(text):
-    pat = ".*- (.+[^:]) (left|added|created group|removed|now an admin|changed this group.s icon| changed the subject from | changed the group description | no longer an admin | was added | deleted this group's icon)(.*)"
+    if len(text.split(':')) > 2:
+        return None
+    pat = ".*- (.+[^:]) (left|added|created group|removed|now an admin|changed this group.s icon|changed the subject from |changed the group description |no longer an admin |was added |deleted this group.s icon)(.*)"
     compiled = re.compile(pat)
     allmatches = compiled.match(text)
     return allmatches
 
 
 if __name__ == "__main__":
-    parse_action(
+    left = parse_action(
         "3/1/20, 8:01 PM - Person1 left")
-    parse_action("11/21/19, 10:28 PM - Person1 changed this group's icon")
-    parse_action(
-        "11/5/19, 9:44 PM - Person2: hello friends..example")
+    assert(left.group(1) == 'Person1')
+    changedicon = parse_action(
+        "11/21/19, 10:28 PM - Person1 changed this group's icon")
+    assert(changedicon.group(1) == 'Person1')
+    normalmsg = parse_action(
+        "11/5/19, 9:44 PM - Person2: hello friends why you left..example")
+    assert(normalmsg == None)
+    deletedicon = parse_action(
+        "12/6/19, 11:10 AM - fn ln deleted this group's icon")
+    assert(deletedicon.group(1) == 'fn ln')
+    changedSubject = parse_action(
+        '12/14/19, 7:45 PM - fn ln changed the subject from "abc..." to "Happy Birthday xyz')
+    assert(changedSubject.group(1) == 'fn ln')
+    added = parse_action("12/9/19, 12:12 AM - fnd2 added fnd1")
+    assert(added.group(1) == 'fnd2')
+    removed = parse_action("2/20/20, 9:24 PM - fnd2 removed +11 11111 11111")
+    assert(removed.group(1) == 'fnd2')
