@@ -24,6 +24,16 @@ def parse_file(text_file, allrecord=True):
     message = []
     datetime = []
     language = []
+
+    actiondatetime = []
+    actor = []
+    action = []
+    actedon = []
+
+    lastdate = None
+    lastsender = None
+    lastmessage = None
+
     for row in data:
 
         # timestamp is before the first dash
@@ -39,26 +49,43 @@ def parse_file(text_file, allrecord=True):
         tmp_msg = ''
         tmp_lang = ''
         try:
-            tmp_sender = re.search('[mM] - (.*?):', row).group(1)
-        # message content is after the first colon
-            tmp_msg = (row.split(': ', 1)[1])
-        # language spoken
-            line = (row.split(': ', 1)[1])
-            if(re.match(r"(\<Media omitted\>)", line)):
-                tmp_lang = 'media'
-            else:
-                tmp_lang = (detectLang(line))
+            actions = get_action_type(row)
+            if actions != None and lu.shouldInsert(tmp_dt, actions.group(1), actions.group(2)):
+                actiondatetime.append(tmp_dt)
+                actor.append(actions.group(1))
+                action.append(actions.group(2))
+                actedon.append(actions.group(3))
 
-            if allrecord == True or lu.shouldInsert(tmp_dt, tmp_sender, tmp_msg):
-                datetime.append(tmp_dt)
-                sender.append(tmp_sender)
-                message.append(tmp_msg)
-                language.append(tmp_lang)
+                lastdate = tmp_dt
+                lastsender = actions.group(1)
+                lastmessage = actions.group(2)
+
+            # it is not action type - process as message. else process as action
+            else:
+                tmp_sender = re.search('[mM] - (.*?):', row).group(1)
+            # message content is after the first colon
+                tmp_msg = (row.split(': ', 1)[1])
+            # language spoken
+                line = (row.split(': ', 1)[1])
+                if(re.match(r"(\<Media omitted\>)", line)):
+                    tmp_lang = 'media'
+                else:
+                    tmp_lang = (detectLang(line))
+
+                if allrecord == True or lu.shouldInsert(tmp_dt, tmp_sender, tmp_msg):
+                    datetime.append(tmp_dt)
+                    sender.append(tmp_sender)
+                    message.append(tmp_msg)
+                    language.append(tmp_lang)
+                    lastdate = tmp_dt
+                    lastsender = tmp_sender
+                    lastmessage = tmp_msg
+
         except:
             tmp_lang = ''
 
-    if allrecord == False and len(datetime) > 0:
-        lu.updateInsertTimestamp(datetime[-1], sender[-1], message[-1])
+    if allrecord == False and lastdate != None:
+        lu.updateInsertTimestamp(lastdate, lastsender, lastmessage)
     df = pd.DataFrame(zip(datetime, sender, message, language), columns=[
                       'timestamp', 'sender', 'message', 'language'])
 
@@ -68,7 +95,11 @@ def parse_file(text_file, allrecord=True):
     # remove events not associated with a sender
     df = df[df.sender != ''].reset_index(drop=True)
 
-    return df
+    # action dataframe
+    df_action = pd.DataFrame(
+        zip(actiondatetime, actor, action, actedon), columns=['timestamp', 'actor', 'action', 'actedon'])
+
+    return df, df_action
 
 
 def countMedia(df, allmsg_stat):
@@ -136,3 +167,22 @@ def GetLatestFile(dirname, pattern):
     except:
         pass
     return latest_file
+
+
+def parse_action(text):
+    allmatches = get_action_type(text)
+
+
+def get_action_type(text):
+    pat = ".*- (.+[^:]) (left|added|created group|removed|now an admin|changed this group.s icon| changed the subject from | changed the group description | no longer an admin | was added | deleted this group's icon)(.*)"
+    compiled = re.compile(pat)
+    allmatches = compiled.match(text)
+    return allmatches
+
+
+if __name__ == "__main__":
+    parse_action(
+        "3/1/20, 8:01 PM - Person1 left")
+    parse_action("11/21/19, 10:28 PM - Person1 changed this group's icon")
+    parse_action(
+        "11/5/19, 9:44 PM - Person2: hello friends..example")

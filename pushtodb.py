@@ -13,9 +13,12 @@ if len(sys.argv) < 2 or os.environ.get('ENGINE_POWER') == None:
     exit(1)
 filename = utilities.GetLatestFile(sys.argv[1], "/WhatsApp*")
 print('Reading chat from '+filename)
-df = utilities.parse_file(filename, allrecord=False)
+df, df_action = utilities.parse_file(filename, allrecord=False)
 # print(df.head(2))
+# print(df_action.head(2))
+
 engine = create_engine(os.environ['ENGINE_POWER'])
 df.to_sql('chat_text', con=engine, if_exists='append', index=False)
+df_action.to_sql('chat_action', con=engine, if_exists='append', index=False)
 print('done')
 sendSignal("importjob")
