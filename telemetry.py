@@ -19,6 +19,6 @@ def sendSignal(signaltype):
 
 
 if __name__ == "__main__":
-    sendSignal("importjob")
+    sendSignal(sys.argv[1] if len(sys.argv)>1 else "importjob")
 
     pass
