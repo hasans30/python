@@ -35,7 +35,6 @@ def parse_file(text_file, allrecord=True):
     lastmessage = None
 
     for row in data:
-
         # timestamp is before the first dash
         tmp_dt = row.split(' - ')[0]
         tmp_dt = datetimelib.datetime.strptime(tmp_dt, '%m/%d/%y, %I:%M %p')
@@ -202,3 +201,6 @@ if __name__ == "__main__":
     assert(added.group(1) == 'fnd2')
     removed = parse_action("2/20/20, 9:24 PM - fnd2 removed +11 11111 11111")
     assert(removed.group(1) == 'fnd2')
+    file = GetLatestFile(
+        R'C:\Users\msheikh\OneDrive\Documents\Angikaar\chat', "/WhatsApp*")
+    print(file)
