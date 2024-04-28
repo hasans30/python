@@ -37,7 +37,7 @@ def parse_file(text_file, allrecord=True):
     for row in data:
         # timestamp is before the first dash
         tmp_dt = row.split(' - ')[0]
-        tmp_dt = datetimelib.datetime.strptime(tmp_dt, '%m/%d/%y, %I:%M %p')
+        tmp_dt = datetimelib.datetime.strptime(tmp_dt, '%m/%d/%y, %H:%M')
         pstpdt = pytz.timezone('US/Pacific')
         tmp_dt = pstpdt.localize(tmp_dt)
         ist = pytz.timezone('Asia/Calcutta')
@@ -49,7 +49,7 @@ def parse_file(text_file, allrecord=True):
         tmp_lang = ''
         try:
             actions = get_action_type(row)
-            if actions != None and lu.shouldInsert(tmp_dt, actions.group(1), actions.group(2)):
+            if actions != None: 
                 actiondatetime.append(tmp_dt)
                 actor.append(actions.group(1))
                 action.append(actions.group(2))
@@ -61,7 +61,7 @@ def parse_file(text_file, allrecord=True):
 
             # it is not action type - process as message. else process as action
             else:
-                tmp_sender = re.search('[mM] - (.*?):', row).group(1)
+                tmp_sender = re.search('.* - (.*?):', row).group(1)
             # message content is after the first colon
                 tmp_msg = (row.split(': ', 1)[1])
             # language spoken
@@ -175,15 +175,29 @@ def parse_action(text):
 def get_action_type(text):
     if len(text.split(':')) > 2:
         return None
-    pat = ".*- (.+[^:]) (left|added|created group|removed|now an admin|changed this group.s icon|changed the subject from |changed the group description |no longer an admin |was added |deleted this group.s icon)(.*)"
+    pat = ".*- (.+[^:]) (left|added|created group|removed|now an admin|changed this group.s icon|changed the subject from |changed the group description |no longer an admin |was added |deleted this group.s icon|joined from the community|requested to join.)(.*)"
     compiled = re.compile(pat)
     allmatches = compiled.match(text)
     return allmatches
 
 
+def print_sender_count(df):
+    n_days =180 
+    print(f"printing information from past : {n_days} days")
+
+    given_timestamp = max(df['timestamp'])
+    seven_days_ago = given_timestamp - datetimelib.timedelta(days=n_days)
+    df_last_n_days = df[df['timestamp'] > seven_days_ago]
+    # Calculate message_count
+    message_count = df_last_n_days['sender'].value_counts()
+    # Print message_count
+    print(message_count.to_frame().rename(columns={'sender': 'count'}).reset_index().to_string(index=True))
+
 if __name__ == "__main__":
+    df,dfAction = parse_file("./data/WhatsApp Chat with IIEST SIG DataSciences ComputerSciences.txt");
+    print_sender_count(df)
     left = parse_action(
-        "3/1/20, 8:01 PM - Person1 left")
+        "3a/1/20, 8:01 PM - Person1 left")
     assert(left.group(1) == 'Person1')
     changedicon = parse_action(
         "11/21/19, 10:28 PM - Person1 changed this group's icon")
